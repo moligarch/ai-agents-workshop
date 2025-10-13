@@ -1,0 +1,7 @@
+[
+    {"temp": 18.8, "occupied": true},
+    {"temp": 20.6, "occupied": true},
+    {"temp": 21.2, "occupied": true},
+    {"temp": 22.9, "occupied": false},
+    {"temp": 24.8, "occupied": false}
+]
