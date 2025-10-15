@@ -3,8 +3,8 @@ Section 4 — Indexer (PDF/text ingestion → chunk → embed → persist)
 
 OVERVIEW
 --------
-Reads source documents (PDF or plain text), splits into language‑aware chunks,
-computes embeddings (TF‑IDF by default), and persists an index as a **pickle**
+Reads source documents (PDF or plain text), splits into language-aware chunks,
+computes embeddings (TF-IDF by default), and persists an index as a **pickle**
 file. Designed to be deterministic and portable for workshops.
 
 INDEX FORMAT (pickled dict)
@@ -24,13 +24,13 @@ INDEX FORMAT (pickled dict)
 FUNCTIONS
 ---------
 - `ingest_pdf(path)` → text
-- `ingest_text_file(path)` → text
+- `ingest_text_file(path, encoding='utf-8')` → text (validates it's not a PDF)
 - `build_index(text, lang, emb_name, chunk_size, overlap)` → index dict
 - `save_index(index, path)` / `load_index(path)`
 """
 
 from __future__ import annotations
-from typing import Dict, Any, Tuple
+from typing import Dict, Any
 import os
 import pickle
 
@@ -39,6 +39,15 @@ from pypdf import PdfReader
 
 from chunking import chunk_text
 from embeddings import TfidfEmbedding, SbertEmbedding
+
+
+def _is_pdf(path: str) -> bool:
+    try:
+        with open(path, "rb") as f:
+            head = f.read(5)
+        return head.startswith(b"%PDF-")
+    except Exception:
+        return path.lower().endswith(".pdf")
 
 
 def ingest_pdf(path: str) -> str:
@@ -54,8 +63,11 @@ def ingest_pdf(path: str) -> str:
     return "\n".join(texts)
 
 
-def ingest_text_file(path: str) -> str:
-    with open(path, "r", encoding="utf-8") as f:
+def ingest_text_file(path: str, *, encoding: str = "utf-8") -> str:
+    # Guard against PDFs passed to --text
+    if _is_pdf(path):
+        raise ValueError(f"File looks like a PDF: {path}. Use --pdf instead of --text.")
+    with open(path, "r", encoding=encoding) as f:
         return f.read()
 
 
