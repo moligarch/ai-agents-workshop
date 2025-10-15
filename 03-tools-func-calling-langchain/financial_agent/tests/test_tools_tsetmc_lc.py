@@ -21,7 +21,7 @@ def test_need_key_error(monkeypatch):
     importlib.reload(mod)
 
     # Call tool directly
-    out = mod._get_tsetmc_quote(symbol="IKCO", price_field="pc")
+    out = mod._get_tsetmc_quote(mod._GetQuoteArgs(symbol="IKCO", price_field="pc"))
     data = json.loads(out)
     assert data["type"] == "TOOL_ERROR"
     assert "Missing BRSAPI_KEY" in data["message"]
@@ -74,7 +74,7 @@ def test_symbol_snapshot_success(monkeypatch):
 
     monkeypatch.setattr(mod, "_get", fake_get)
 
-    out = mod._get_tsetmc_quote(symbol="IKCO", price_field="pc")
+    out = mod._get_tsetmc_quote(mod._GetQuoteArgs(symbol="IKCO", price_field="pc"))
     data = json.loads(out)
     assert data["type"] == "QUOTE"
     assert data["symbol_l18"] == "خودرو"

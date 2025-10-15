@@ -5,8 +5,6 @@ TEST_DIR = os.path.dirname(__file__)
 ROOT_DIR = os.path.abspath(os.path.join(TEST_DIR, ".."))
 if ROOT_DIR not in sys.path: sys.path.insert(0, ROOT_DIR)
 
-import os
-
 from agent_lc import build_agent
 
 

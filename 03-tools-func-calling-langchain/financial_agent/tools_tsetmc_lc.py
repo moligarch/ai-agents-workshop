@@ -91,7 +91,8 @@ class _GetTimeArgs(BaseModel):
     pass
 
 
-def _get_time(_: _GetTimeArgs) -> str:
+def _get_time(*_args, **_kwargs) -> str:
+    """Return local time as JSON string. Accepts no args or ignores any provided."""
     return _json({"type": "TIME", "iso": datetime.now().isoformat(timespec="seconds")})
 
 
@@ -127,14 +128,24 @@ def _resolve_l18(symbol: str) -> Tuple[Optional[str], Optional[str]]:
     return None, f"symbol '{symbol}' not found in AllSymbols"
 
 
-def _get_tsetmc_quote(symbol: str, price_field: Literal["pl", "pc", "py"] = "pc") -> str:
-    """Fetch a TSETMC quote for a symbol via BrsApi.
+def _get_tsetmc_quote(*args, **kwargs) -> str:
+    """
+    Fetch a TSETMC quote for a symbol via BrsApi.
 
-    LangChain StructuredTool passes validated arguments as **kwargs**, so this
-    function must accept `symbol` and `price_field` as keyword parameters.
+    Accepts either:
+      - Pydantic object style:   _get_tsetmc_quote(_GetQuoteArgs(...))
+      - Kwargs style (LangChain): _get_tsetmc_quote(symbol="...", price_field="pc")
     """
     if not BRSAPI_KEY:
         return _need_key()
+
+    # Extract inputs from either style
+    if args and isinstance(args[0], _GetQuoteArgs):
+        symbol = args[0].symbol
+        price_field = args[0].price_field
+    else:
+        symbol = kwargs.get("symbol", "")
+        price_field = kwargs.get("price_field", "pc")
 
     l18, err = _resolve_l18(symbol)
     if err and not l18:
