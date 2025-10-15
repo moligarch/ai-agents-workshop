@@ -1,21 +1,21 @@
 """
-Section 4 — Embedding backends (TF‑IDF baseline, optional SBERT)
+Section 4 — Embedding backends (TF-IDF baseline, optional SBERT)
 
 OVERVIEW
 --------
 Provides a small abstraction for embeddings so we can switch between a
-**TF‑IDF** baseline (portable, no downloads) and an optional
+**TF-IDF** baseline (portable, no downloads) and an optional
 **SentenceTransformer** backend when installed.
 
 API
 ---
 - `BaseEmbedding`: defines `fit_transform(texts)` and `transform(texts)`.
-- `TfidfEmbedding`: scikit‑learn TF‑IDF; stores the vectorizer in the index for reuse.
-- `SbertEmbedding`: lazy‑imports `sentence_transformers.SentenceTransformer`.
+- `TfidfEmbedding`: scikit-learn TF-IDF; stores the vectorizer in the index for reuse.
+- `SbertEmbedding`: lazy-imports `sentence_transformers.SentenceTransformer`.
 
 NOTES
 -----
-- We operate on **strings of chunks** (already split). For TF‑IDF this is ideal.
+- We operate on **strings of chunks** (already split). For TF-IDF this is ideal.
 - Cosine similarity is used downstream; outputs are `numpy.ndarray`.
 """
 

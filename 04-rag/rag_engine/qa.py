@@ -7,7 +7,7 @@ Two answer modes:
 1) **Offline extractive** (default) — returns the top chunks with a short
    heuristic summary.
 2) **LLM synthesis** (optional) — if `OPENAI_API_KEY` is set or passed via env,
-   call an OpenAI‑compatible chat model to synthesize a grounded answer. Router
+   call an OpenAI-compatible chat model to synthesize a grounded answer. Router
    base URLs are supported.
 
 PUBLIC API

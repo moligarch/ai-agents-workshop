@@ -1,9 +1,9 @@
 """
-Section 4 — Chunking utilities (language‑aware sentence grouping)
+Section 4 — Chunking utilities (language-aware sentence grouping)
 
 OVERVIEW
 --------
-Provides deterministic, dependency‑light text chunking for RAG. We split text
+Provides deterministic, dependency-light text chunking for RAG. We split text
 into sentences, then group sentences into chunks of approximately N **words**
 with an optional **overlap**. Persian (fa) tokenization uses `hazm` if
 available; otherwise we fall back to a naive splitter.
@@ -38,7 +38,7 @@ _EN_SENT_SPLIT = re.compile(r"(?<=[.!?])\s+")
 
 
 def split_sentences(text: str, lang: str) -> List[str]:
-    """Split `text` into sentences using simple, language‑aware rules.
+    """Split `text` into sentences using simple, language-aware rules.
 
     - en: regex split on end punctuation + whitespace
     - fa: hazm Normalizer + sent_tokenize if available; else fallback to newline/period split
@@ -62,7 +62,7 @@ def split_sentences(text: str, lang: str) -> List[str]:
 
 
 def make_chunks(sentences: List[str], chunk_size: int = 600, overlap: int = 120) -> List[str]:
-    """Group sentences into word‑bounded chunks.
+    """Group sentences into word-bounded chunks.
 
     Args:
         sentences: list of sentence strings

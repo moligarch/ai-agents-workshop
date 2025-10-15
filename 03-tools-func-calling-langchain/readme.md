@@ -1,6 +1,6 @@
 # Section 3 — Tools & Function Calling with **LangChain** (TSETMC Edition)
 
-This section rebuilds our function‑calling agent on **LangChain**, using **StructuredTool**s and OpenAI function calling. The agent can fetch **TSETMC** (Tehran Stock Exchange) snapshot data via **BrsApi.ir**, and it’s portable, router‑friendly (e.g., MetisAI), and traceable with `--verbose`.
+This section rebuilds our function-calling agent on **LangChain**, using **StructuredTool**s and OpenAI function calling. The agent can fetch **TSETMC** (Tehran Stock Exchange) snapshot data via **BrsApi.ir**, and it’s portable, router-friendly (e.g., MetisAI), and traceable with `--verbose`.
 
 ---
 
@@ -8,10 +8,10 @@ This section rebuilds our function‑calling agent on **LangChain**, using **Str
 
 We’ve seen manual ReAct loops (Section 2). Here you’ll:
 
-* Use **LangChain**’s batteries‑included tool‑calling agent to reduce boilerplate.
+* Use **LangChain**’s batteries-included tool-calling agent to reduce boilerplate.
 * Define safe, typed tools with **Pydantic** schemas.
-* Wire a real‑world data source (TSETMC/BrsApi) into the agent.
-* Keep it **portable**: clear env vars, minimal deps, offline‑friendly tests.
+* Wire a real-world data source (TSETMC/BrsApi) into the agent.
+* Keep it **portable**: clear env vars, minimal deps, offline-friendly tests.
 
 ---
 
@@ -19,7 +19,7 @@ We’ve seen manual ReAct loops (Section 2). Here you’ll:
 
 By the end, participants can:
 
-* Build a **tool‑calling agent** with `create_tool_calling_agent` + `AgentExecutor`.
+* Build a **tool-calling agent** with `create_tool_calling_agent` + `AgentExecutor`.
 * Implement **StructuredTool**s and validate inputs via Pydantic.
 * Call **TSETMC** endpoints and return structured JSON observations.
 * Configure **router/base URL** (e.g., MetisAI) and use **`--verbose`** tracing.
@@ -48,7 +48,7 @@ ai-agents-workshop/
 
 ## Tools implemented (TSETMC via BrsApi.ir)
 
-* `get_time()` → local ISO‑8601 timestamp (no network).
+* `get_time()` → local ISO-8601 timestamp (no network).
 * `get_tsetmc_quote(symbol: str, price_field: 'pl'|'pc'|'py'='pc')` →
   resolves Latin/ISIN or Persian `l18` and returns a snapshot with key fields (`pl` last, `pc` close, `py` yesterday). Currency: **IRR**.
 
@@ -74,7 +74,7 @@ cp .env.example .env
 #   OPENAI_BASE_URL=https://api.metisai.ir/openai/v1
 ```
 
-> Tests do **not** hit the network. They mock HTTP calls and/or avoid LLM calls entirely, so the suite is classroom‑friendly.
+> Tests do **not** hit the network. They mock HTTP calls and/or avoid LLM calls entirely, so the suite is classroom-friendly.
 
 ---
 
@@ -92,7 +92,7 @@ TSETMC quote (Persian `l18`):
 python runner.py --query "Fetch pc (close) for نماد 'خودرو'" --max-steps 4 --verbose
 ```
 
-TSETMC quote (Latin/ISIN → auto‑resolve):
+TSETMC quote (Latin/ISIN → auto-resolve):
 
 ```bash
 python runner.py --query "Get 'pl' (last) for IKCO" --max-steps 4 --verbose
@@ -111,7 +111,7 @@ python runner.py --query "IKCO latest 'py' (yesterday)." \
 ## Verbose tracing (`--verbose`)
 
 * Prints agent decisions, tool calls, tool outputs (truncated), final message.
-* **Never** prints chain‑of‑thought; it logs structure only.
+* **Never** prints chain-of-thought; it logs structure only.
 
 Example (abridged):
 
@@ -126,7 +126,7 @@ Example (abridged):
 ## How it works (high level)
 
 1. **Structured tools.** `tools_tsetmc_lc.py` defines Pydantic arg schemas and returns **JSON strings**.
-2. **Agent.** `agent_lc.py` builds `ChatOpenAI` (router‑friendly) → binds tools via `create_tool_calling_agent` → runs with `AgentExecutor`.
+2. **Agent.** `agent_lc.py` builds `ChatOpenAI` (router-friendly) → binds tools via `create_tool_calling_agent` → runs with `AgentExecutor`.
 3. **CLI.** `runner.py` parses flags and prints the final answer.
 
 ---
@@ -136,7 +136,7 @@ Example (abridged):
 * **LangChain** to lower boilerplate for tool calling and tracing.
 * **Pydantic** to validate tool inputs (deterministic errors).
 * **JSON string** tool outputs for easy model consumption.
-* **Router/base‑url** to work behind gateways like MetisAI.
+* **Router/base-url** to work behind gateways like MetisAI.
 
 ---
 
@@ -152,5 +152,5 @@ Example (abridged):
 ## Exercises
 
 1. Add a candle tool: `get_tsetmc_candle(l18, timeframe)` and display OHLC later.
-2. Add an in‑memory cache for symbol resolution.
+2. Add an in-memory cache for symbol resolution.
 3. Add a `unit_convert` tool (°C/°F, km/mi) to showcase multiple tools.

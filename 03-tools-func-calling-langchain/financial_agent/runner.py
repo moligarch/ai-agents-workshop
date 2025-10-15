@@ -1,10 +1,10 @@
 """
-Section 3 — CLI Runner (LangChain tool‑calling agent)
+Section 3 — CLI Runner (LangChain tool-calling agent)
 
 OVERVIEW
 --------
-Thin command‑line wrapper around the LangChain agent. It reads CLI flags (query,
-model, base‑url, steps, verbose), builds the agent, runs a single query, and
+Thin command-line wrapper around the LangChain agent. It reads CLI flags (query,
+model, base-url, steps, verbose), builds the agent, runs a single query, and
 prints the final answer to stdout.
 
 FLAGS
@@ -12,8 +12,8 @@ FLAGS
 --query       : required user question/instruction.
 --max-steps   : cap on iterations (default: 6).
 --model       : optional model override (e.g., gpt-4o-mini).
---base-url    : optional router URL (OpenAI‑compatible), e.g. https://api.metisai.ir/openai/v1
---verbose     : print step‑by‑step trace (tool calls, observations, final).
+--base-url    : optional router URL (OpenAI-compatible), e.g. https://api.metisai.ir/openai/v1
+--verbose     : print step-by-step trace (tool calls, observations, final).
 
 ENVIRONMENT
 -----------

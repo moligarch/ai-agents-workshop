@@ -1,10 +1,10 @@
 """
-Section 4 — Retriever (cosine similarity top‑K search)
+Section 4 — Retriever (cosine similarity top-K search)
 
 OVERVIEW
 --------
-Given a saved index (vectors + chunks), run a cosine‑similarity search to return
-the top‑K most relevant chunks for a user query. Supports both TF‑IDF (needs
+Given a saved index (vectors + chunks), run a cosine-similarity search to return
+the top-K most relevant chunks for a user query. Supports both TF-IDF (needs
 stored vectorizer to transform the query) and SBERT (model encodes query).
 
 FUNCTIONS
@@ -26,7 +26,7 @@ def query_to_vector(index, text: str) -> np.ndarray:
     if emb == "tfidf":
         tfidf = index.get("tfidf_vectorizer")
         if tfidf is None:
-            raise RuntimeError("TF‑IDF vectorizer missing from index")
+            raise RuntimeError("TF-IDF vectorizer missing from index")
         vec = tfidf.transform([text]).astype("float32").toarray()
         return vec
     elif emb == "sbert":
