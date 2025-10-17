@@ -111,7 +111,7 @@ class OpenAIChat(LLM):
       - OPENAI_API_KEY  (use the router's key if you use a router)
     Optional:
       - MODEL (defaults to gpt-4o-mini)
-      - OPENAI_BASE_URL or OPENAI_API_BASE (when using a router)
+      - OPENAI_BASE_URL (when using a router)
     """
     def __init__(self, model: Optional[str] = None, *, api_key: Optional[str] = None, base_url: Optional[str] = None):
         from openai import OpenAI  # lazy import to keep tests light
