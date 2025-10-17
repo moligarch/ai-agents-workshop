@@ -1,0 +1,1 @@
+"""Persian language utilities for RAG (tokenization/chunking via hazm if available)."""
