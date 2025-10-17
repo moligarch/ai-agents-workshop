@@ -60,9 +60,7 @@ pip install -r requirements.txt
 Single decision from CLI:
 
 ```bash
-python thermostat_agent.py decide \
-  --mode auto --setpoint_h 21 --setpoint_c 24 \
-  --deadband 1.0 --eco_offset 2.0 --occupied true --temp 19.2
+python thermostat_agent.py decide --mode auto --setpoint_h 21 --setpoint_c 24 --deadband 1.0 --eco_offset 2.0 --occupied true --temp 19.2
 ```
 
 Simulate a scenario file:

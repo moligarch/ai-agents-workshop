@@ -81,11 +81,7 @@ MODEL=gpt-4o-mini   # or a model name supported by your router
 **Option B — via CLI**
 
 ```bash
-python3 runner.py \
-  --query "What is 12*8? Then add 10." \
-  --max-steps 3 \
-  --base-url https://api.metisai.ir/openai/v1 \
-  --model gpt-4o-mini
+python3 runner.py --query "What is 12*8? Then add 10." --max-steps 3 --base-url https://api.metisai.ir/openai/v1 --model gpt-4o-mini
 ```
 
 > The code prefers the CLI `--base-url` if provided; otherwise it looks for `OPENAI_BASE_URL` (or `OPENAI_API_BASE`). Use your router’s API key in `OPENAI_API_KEY`.

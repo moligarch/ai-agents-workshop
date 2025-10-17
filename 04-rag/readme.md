@@ -86,14 +86,9 @@ python cli.py query --index ./index.pkl \
 ### 4) Persian mini-module (hazm)
 
 ```bash
-python cli.py index \
-  --text ./samples/fa_rules.txt \
-  --lang fa \
-  --out ./fa_index.pkl \
-  --chunk-size 400 --chunk-overlap 80 --emb tfidf
+python cli.py index --pdf ./sample/fa1.pdf --lang fa --out ./fa_index.pkl --chunk-size 400 --chunk-overlap 80 --emb tfidf
 
-python cli.py query --index ./fa_index.pkl \
-  --q "قوانین مرخصی چگونه است؟" --top-k 3
+python cli.py query --index ./fa_index.pkl   --q "answer this question and give result in structured format: عوامل موثر بر تأثیر بازاریابی گوشه ای بر وفاداری مشتریان در صنایع ورزشی با استفاده از تکنیکهای هوش مصنوعی چیست؟"   --top-k 4  --llm
 ```
 
 ---
