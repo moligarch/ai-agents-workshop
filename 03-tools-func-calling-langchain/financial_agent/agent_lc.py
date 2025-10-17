@@ -51,7 +51,7 @@ def build_llm(model: str | None = None, base_url: str | None = None) -> ChatOpen
     never misses credentials even if environment loaders weren't triggered elsewhere.
     """
     model = model or os.getenv("MODEL", "gpt-4o-mini")
-    base_url = base_url or os.getenv("OPENAI_BASE_URL") or os.getenv("OPENAI_API_BASE")
+    base_url = base_url or os.getenv("OPENAI_BASE_URL")
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         raise RuntimeError("OPENAI_API_KEY is not set. Put it in .env or environment.")
@@ -61,7 +61,6 @@ def build_llm(model: str | None = None, base_url: str | None = None) -> ChatOpen
 def build_agent(
     model: str | None = None,
     base_url: str | None = None,
-    *,
     max_steps: int = 6,
     verbose: bool = False,
 ) -> AgentExecutor:
