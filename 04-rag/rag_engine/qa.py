@@ -1,25 +1,19 @@
 """
 Section 4 — QA: offline extractive + optional OpenAI synthesis
 
-OVERVIEW
---------
 Two answer modes:
-1) **Offline extractive** (default) — returns the top chunks with a short
-   heuristic summary.
-2) **LLM synthesis** (optional) — if `OPENAI_API_KEY` is set or passed via env,
-   call an OpenAI-compatible chat model to synthesize a grounded answer. Router
-   base URLs are supported.
+1) Offline extractive summary (default).
+2) LLM synthesis (optional, OpenAI-compatible).
 
-PUBLIC API
-----------
-- `answer_offline(question, retrieved)` → str
-- `answer_with_llm(question, retrieved, model, base_url)` → str
+Citations control (via CLI --citations):
+- inline: keep [chunk:ID] inline.
+- refs  : remove inline tags; append a 'Sources:' list with IDs and previews.
+- none  : strip all [chunk:ID] tags.
 """
-
 from __future__ import annotations
 from typing import List, Tuple, Optional
 import os
-import textwrap
+import re
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -37,24 +31,70 @@ def _first_lines(s: str, n: int = 2) -> str:
     return " ".join(lines[:n])
 
 
-def answer_offline(question: str, retrieved: List[Tuple[float, str, int]]) -> str:
+def _preview(text: str, n: int = 160) -> str:
+    t = " ".join(text.split())
+    return (t[: n] + "…") if len(t) > n else t
+
+
+def _strip_inline_tags(text: str) -> str:
+    return re.sub(r"\[chunk:\d+\]", "", text)
+
+
+def _append_sources_block(text: str, retrieved: List[Tuple[float, str, int]]) -> str:
+    lines = ["", "Sources:"]
+    # unique order by appearance (based on retrieved order)
+    seen = set()
+    for _, chunk, idx in retrieved:
+        if idx in seen:
+            continue
+        seen.add(idx)
+        lines.append(f"- [{idx}] {_preview(chunk, 140)}")
+    return text.rstrip() + "\n" + "\n".join(lines)
+
+
+def answer_offline(
+    question: str,
+    retrieved: List[Tuple[float, str, int]],
+    *,
+    citations: str = "inline",
+    verbose: bool = False,
+) -> str:
     if not retrieved:
         return "I couldn't find anything relevant in the index."
-    # Simple heuristic: echo top passages with a gist line
-    bullets = []
-    for score, chunk, idx in retrieved:
-        bullets.append(f"• [chunk:{idx} score:{score:.3f}] {_first_lines(chunk)}")
+    if verbose:
+        print(f"[rag][qa] offline mode; chunks={len(retrieved)} question='{_preview(question, 80)}' citations={citations}")
+
+    if citations == "inline":
+        bullets = [f"• [chunk:{idx} score:{score:.3f}] {_first_lines(chunk)}" for score, chunk, idx in retrieved]
+        return "\n".join([f"Offline summary for: {question}"] + bullets)
+
+    if citations == "refs":
+        bullets = [f"• {_first_lines(chunk)}" for _, chunk, _ in retrieved]
+        body = "\n".join([f"Offline summary for: {question}"] + bullets)
+        return _append_sources_block(body, retrieved)
+
+    # citations == "none"
+    bullets = [f"• {_first_lines(chunk)}" for _, chunk, _ in retrieved]
     return "\n".join([f"Offline summary for: {question}"] + bullets)
 
 
-def answer_with_llm(question: str, retrieved: List[Tuple[float, str, int]], *, model: Optional[str] = None, base_url: Optional[str] = None) -> str:
+def answer_with_llm(
+    question: str,
+    retrieved: List[Tuple[float, str, int]],
+    *,
+    model: Optional[str] = None,
+    base_url: Optional[str] = None,
+    citations: str = "inline",
+    verbose: bool = False,
+) -> str:
     if not retrieved:
         return "I couldn't find anything relevant in the index."
 
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key or OpenAI is None:
-        # fall back gracefully
-        return answer_offline(question, retrieved)
+        if verbose:
+            print("[rag][qa] LLM unavailable (no API key or SDK); falling back to offline summary")
+        return answer_offline(question, retrieved, citations=citations, verbose=verbose)
 
     model = model or os.getenv("MODEL", "gpt-4o-mini")
     base_url = base_url or os.getenv("OPENAI_BASE_URL") or os.getenv("OPENAI_API_BASE")
@@ -62,7 +102,12 @@ def answer_with_llm(question: str, retrieved: List[Tuple[float, str, int]], *, m
     client = OpenAI(api_key=api_key, base_url=base_url) if base_url else OpenAI(api_key=api_key)
 
     ctx = build_context(retrieved)
-    prompt = rag_prompt(question, ctx)
+    prompt = rag_prompt(question, ctx, citations=citations)
+
+    if verbose:
+        print(f"[rag][qa] LLM synthesis model={model} base_url={base_url or 'default'} citations={citations}")
+        print(f"[rag][qa] context_len chars={len(ctx)} chunks={len(retrieved)}")
+        print(f"[rag][qa] prompt preview:\n{_preview(prompt, 400)}\n---")
 
     resp = client.chat.completions.create(
         model=model,
@@ -72,4 +117,15 @@ def answer_with_llm(question: str, retrieved: List[Tuple[float, str, int]], *, m
         ],
         temperature=0,
     )
-    return resp.choices[0].message.content or ""
+    content = resp.choices[0].message.content or ""
+
+    # Post-process to enforce the citations mode
+    if citations == "none":
+        content = _strip_inline_tags(content)
+    elif citations == "refs":
+        content = _strip_inline_tags(content)
+        content = _append_sources_block(content, retrieved)
+
+    if verbose:
+        print("[rag][qa] LLM response received.")
+    return content
